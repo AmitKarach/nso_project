@@ -1,140 +1,133 @@
+from http import HTTPStatus
+
 import requests
 
-
-def post_message(data):
-    return requests.post('http://127.0.0.1:5000/AddMessage', json=data)
+import test_utils
 
 
 def test_add_message_with_currect_data():
-    data = {
-        'application_id': 1,
-        'session_id': 'aaaa',
-        'message_id': 'bbbb',
-        'participants': ['avi aviv', 'moshe cohen'],
-        'content': 'Hi, how are you today?'
-    }
-    response = post_message(data)
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/AddMessage' url is requested (POST) with the body containing a message with all the right parameters
+    THEN add the message to the DB
+    """
+    data = test_utils.get_message_object(1, 'aaaa', 'bbbb', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
+    response = test_utils.post_message(data)
     assert response.status_code == 201
-    assert response.json() == {'status': 'success'}
-    requests.delete('http://127.0.0.1:5000/DeleteMessage?applicationId=1')
+    requests.delete(test_utils.URL_SERVICE_TEST+'/DeleteMessage', params ={'applicationId' :1})
 
 # **********************************************************************************************************************
 # invalid data:
 
 
 def test_add_message_with_invalid_application_id():
-    data = {
-        'application_id': 'invalid',
-        'session_id': 'aaaa',
-        'message_id': 'bbbb',
-        'participants': ['avi aviv', 'moshe cohen'],
-        'content': 'Hi, how are you today?'
-    }
-    response = post_message(data)
-    assert response.status_code == 400
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/AddMessage' url is requested (POST) with the body containing a message with invalid application_id
+    THEN return status code 400
+    """
+    data = test_utils.get_message_object('invalid', 'aaaa', 'bbbb', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
+    response = test_utils.post_message(data)
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_add_message_with_invalid_session_id():
-    data = {
-        'application_id': 1,
-        'session_id': 1231,
-        'message_id': 'bbbb',
-        'participants': ['avi aviv', 'moshe cohen'],
-        'content': 'Hi, how are you today?'
-    }
-    response = post_message(data)
-    assert response.status_code == 400
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/AddMessage' url is requested (POST) with the body containing a message with invalid session_id
+    THEN return status code 400
+    """
+    data = test_utils.get_message_object(1, 1231, 'bbbb', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
+    response = test_utils.post_message(data)
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_add_message_with_invalid_message_id():
-    data = {
-        'application_id': 1,
-        'session_id': 'bbbb',
-        'message_id': 123,
-        'participants': ['avi aviv', 'moshe cohen'],
-        'content': 'Hi, how are you today?'
-    }
-    response = post_message(data)
-    assert response.status_code == 400
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/AddMessage' url is requested (POST) with the body containing a message with invalid message_id
+    THEN return status code 400
+    """
+    data = test_utils.get_message_object(1, 'aaaa', 123, ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
+    response = test_utils.post_message(data)
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_add_message_with_invalid_participants():
-    data = {
-        'application_id': 1,
-        'session_id': 'aaa',
-        'message_id': 'bbbb',
-        'participants': 123,
-        'content': 'Hi, how are you today?'
-    }
-    response = post_message(data)
-    assert response.status_code == 400
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/AddMessage' url is requested (POST) with the body containing a message with invalid participants
+    THEN return status code 400
+    """
+    data = test_utils.get_message_object(1, 'aaaa', 'bbbb',123, 'Hi, how are you today?')
+    response = test_utils.post_message(data)
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_add_message_with_invalid_content():
-    data = {
-        'application_id': 1,
-        'session_id': 'aaa',
-        'message_id': 'bbbb',
-        'participants': ['avi aviv', 'moshe cohen'],
-        'content': 1323
-    }
-    response = post_message(data)
-    assert response.status_code == 400
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/AddMessage' url is requested (POST) with the body containing a message with invalid content
+    THEN return status code 400
+    """
+    data = test_utils.get_message_object(1, 'aaaa', 'bbbb', ['avi aviv', 'moshe cohen'],  1323)
+    response = test_utils.post_message(data)
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 # **********************************************************************************************************************
 # missing data:
 
 def test_add_message_with_missing_application_id():
-    data = {
-        'session_id': 'aaa',
-        'message_id': 'bbbb',
-        'participants': ['avi aviv', 'moshe cohen'],
-        'content': 'Hi, how are you today?'
-    }
-    response = post_message(data)
-    assert response.status_code == 400
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/AddMessage' url is requested (POST) with the body containing a message with missing application_id
+    THEN return status code 400
+    """
+    data = test_utils.get_message_object('aaaa', 'bbbb', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
+    response = test_utils.post_message(data)
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_add_message_with_missing_session_id():
-    data = {
-        'application_id': 1,
-        'message_id': 'bbbb',
-        'participants': ['avi aviv', 'moshe cohen'],
-        'content': 'Hi, how are you today?'
-    }
-    response = post_message(data)
-    assert response.status_code == 400
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/AddMessage' url is requested (POST) with the body containing a message with missing session_id
+    THEN return status code 400
+    """
+    data = test_utils.get_message_object(1, 'bbbb', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
+    response = test_utils.post_message(data)
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_add_message_with_missing_message_id():
-    data = {
-        'application_id': 1,
-        'session_id': 'aaa',
-        'participants': ['avi aviv', 'moshe cohen'],
-        'content': 'Hi, how are you today?'
-    }
-    response = post_message(data)
-    assert response.status_code == 400
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/AddMessage' url is requested (POST) with the body containing a message with missing message_id
+    THEN return status code 400
+    """
+    data = test_utils.get_message_object(1, 'aaaa',  ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
+    response = test_utils.post_message(data)
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_add_message_with_missing_participants():
-    data = {
-        'application_id': 1,
-        'session_id': 'aaa',
-        'message_id': 'bbbb',
-        'content': 'Hi, how are you today?'
-    }
-    response = post_message(data)
-    assert response.status_code == 400
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/AddMessage' url is requested (POST) with the body containing a message with missing participants
+    THEN return status code 400
+    """
+    data = test_utils.get_message_object(1, 'aaaa', 'bbbb', 'Hi, how are you today?')
+    response = test_utils.post_message(data)
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_add_message_with_missing_content():
-    data = {
-        'application_id': 1,
-        'session_id': 'aaa',
-        'message_id': 'bbbb',
-        'participants': ['avi aviv', 'moshe cohen'],
-    }
-    response = post_message(data)
-    assert response.status_code == 400
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/AddMessage' url is requested (POST) with the body containing a message with missing content
+    THEN return status code 400
+    """
+    data = test_utils.get_message_object(1, 'aaaa', 'bbbb', ['avi aviv', 'moshe cohen'])
+    response = test_utils.post_message(data)
+    assert response.status_code == HTTPStatus.BAD_REQUEST

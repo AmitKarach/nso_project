@@ -37,8 +37,6 @@ def get_messages():
 @app.route('/AddMessage', methods=['POST'])
 def add_message():
     body_data = request.get_json()
-    if len(body_data) <5:
-        return response_texts.CHECK_YOUR_PARAMETERS, HTTPStatus.BAD_REQUEST
     if not message_is_valid(body_data):
         return response_texts.CHECK_YOUR_PARAMETERS, HTTPStatus.BAD_REQUEST
     response = insert_message(
@@ -48,7 +46,7 @@ def add_message():
         json.dumps(body_data['participants']),
         body_data['content'])
     if response.get('status_code') == 0:
-        return {'status': 'success'}, HTTPStatus.CREATED
+        return '', HTTPStatus.CREATED
     return response.get('error_message'), HTTPStatus.INTERNAL_SERVER_ERROR
 
 

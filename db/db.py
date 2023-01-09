@@ -1,3 +1,4 @@
+import json
 import sqlite3
 
 from src.response_texts import INSERT_MESSAGE_ERROR
@@ -23,10 +24,10 @@ def create_messages_table():
 def get_messages_by_query(query):
     cur = get_connection().cursor()
     cur.execute(query)
-    r = [dict((cur.description[i][0], value)
+    r = [dict((cur.description[i][0], json.loads(value) if cur.description[i][0] == 'participants' else value)
               for i, value in enumerate(row)) for row in cur.fetchall()]
     cur.connection.close()
-    return r if r else []
+    return r
 
 
 def get_all_messages_from_db():
@@ -67,7 +68,6 @@ def insert_message(application_id, session_id, message_id, participants, content
     except sqlite3.Error as er:
         status_code = 1
         error_message = er.args[0] if er.args[0] else INSERT_MESSAGE_ERROR
-        print('SQLite error: %s' % (' '.join(er.args)))
     conn.close()
     return {'status_code': status_code, 'error_message': error_message}
 
