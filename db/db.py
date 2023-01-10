@@ -7,7 +7,7 @@ db_search_parameters = {'applicationId': 'application_id', 'sessionId': 'session
 
 
 def get_connection():
-    return sqlite3.connect('Messages.db')
+    return sqlite3.connect('../db/Messages.db')
 
 
 def create_messages_table():
@@ -34,20 +34,23 @@ def get_all_messages_from_db():
     return get_messages_by_query('SELECT * from Messages')
 
 
-def get_condition_query(query_parameters, intersection_parameters):
+def get_condition_query(query_parameters):
     condition = []
-    for parameter in intersection_parameters:
-        if parameter == 'applicationId':
-            condition.append(db_search_parameters[parameter] + '=' + query_parameters[parameter])
-        else:
-            condition.append(db_search_parameters[parameter] + "='" + query_parameters[parameter] + "'")
+    if query_parameters is None:
+        return ''
+    for parameter in db_search_parameters:
+        if query_parameters.get(parameter) is not None:
+            if parameter == 'applicationId':
+                condition.append(db_search_parameters[parameter] + '=' + query_parameters[parameter])
+            else:
+                condition.append(db_search_parameters[parameter] + "='" + query_parameters[parameter] + "'")
 
     return ' WHERE ' + ' and '.join(condition)
 
 
-def get_messages_from_db(query_parameters, intersection_parameters):
+def get_messages_from_db(query_parameters):
     query = 'SELECT * from Messages '
-    query += get_condition_query(query_parameters, intersection_parameters)
+    query += get_condition_query(query_parameters)
     return get_messages_by_query(query)
 
 
@@ -72,9 +75,9 @@ def insert_message(application_id, session_id, message_id, participants, content
     return {'status_code': status_code, 'error_message': error_message}
 
 
-def delete_messages_from_db(query_parameters, intersection_parameters):
+def delete_messages_from_db(query_parameters=None):
     query = 'DELETE from Messages '
-    query += get_condition_query(query_parameters, intersection_parameters)
+    query += get_condition_query(query_parameters)
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(query)

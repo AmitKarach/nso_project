@@ -1,11 +1,14 @@
 import json
-import response_texts
-import config
+
+import pytest
+
+import src.response_texts
+import src.config
 from flask import Flask, request
 from http import HTTPStatus
 from db.db import create_messages_table, insert_message, get_all_messages_from_db, get_messages_from_db, \
     db_search_parameters, delete_messages_from_db
-from src.utils import message_is_valid
+from src.message_validations import message_is_valid
 
 app = Flask('Messages Manager App')
 
@@ -24,9 +27,9 @@ def get_messages():
     intersection_args = args_as_set.intersection(db_search_parameters)
 
     if len(intersection_args) == 0:
-        return response_texts.QUERY_PARAMETER_NAME_WAS_NOT_FOUND, HTTPStatus.BAD_REQUEST
+        return src.response_texts.QUERY_PARAMETER_NAME_WAS_NOT_FOUND, HTTPStatus.BAD_REQUEST
 
-    query_result = get_messages_from_db(args, intersection_args)
+    query_result = get_messages_from_db(args)
 
     if len(query_result) == 0:
         return '', HTTPStatus.NOT_FOUND
@@ -38,7 +41,7 @@ def get_messages():
 def add_message():
     body_data = request.get_json()
     if not message_is_valid(body_data):
-        return response_texts.CHECK_YOUR_PARAMETERS, HTTPStatus.BAD_REQUEST
+        return src.response_texts.CHECK_YOUR_PARAMETERS, HTTPStatus.BAD_REQUEST
     response = insert_message(
         body_data['application_id'],
         body_data['session_id'],
@@ -57,16 +60,21 @@ def delete_messages():
     intersection_args = args_as_set.intersection(db_search_parameters)
 
     if len(intersection_args) == 0:
-        return response_texts.QUERY_PARAMETER_NAME_WAS_NOT_FOUND, HTTPStatus.BAD_REQUEST
+        return src.response_texts.QUERY_PARAMETER_NAME_WAS_NOT_FOUND, HTTPStatus.BAD_REQUEST
 
-    query_result = get_messages_from_db(args, intersection_args)
+    query_result = get_messages_from_db(args)
 
     if len(query_result) == 0:
         return '', HTTPStatus.NOT_FOUND
 
-    delete_messages_from_db(args, intersection_args)
+    delete_messages_from_db(args)
+    return '', HTTPStatus.OK
+
+
+@app.route('/Status', methods=['GET'])
+def status_check():
     return '', HTTPStatus.OK
 
 
 if __name__ == '__main__':
-    app.run(host=config.HOST, port=config.PORT)
+    app.run(host=src.config.HOST, port=src.config.PORT)
