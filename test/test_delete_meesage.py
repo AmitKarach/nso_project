@@ -4,12 +4,41 @@ import requests
 
 import test_utils
 
-def test_delete_without_post():
+
+def test_delete_message_with_application_id_without_post():
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/DeleteMessage' url is requested (DELETE) with the params: applicationId
+    THEN status code should be 404 because there is no POST message
+    """
     response = test_utils.delete_message({'applicationId': 1})
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_delete_one_message_with_applicationId():
+def test_delete_message_with_session_id_without_post():
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/DeleteMessage' url is requested (DELETE) with the params: sessionId
+    THEN status code should be 404 because there is no POST message
+    """
+    response = test_utils.delete_message({'sessionId': 'aaaa'})
+    assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_delete_message_with_message_id_without_post():
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/DeleteMessage' url is requested (DELETE) with the params: messageId
+    THEN status code should be 404 because there is no POST message
+    """
+    response = test_utils.delete_message({'messageId': 'bbbb'})
+    assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+# ***********************************************************************************************************************
+
+
+def test_delete_one_message_with_application_id():
     """
         GIVEN a Flask application configured for testing
         WHEN the '/DeleteMessage' url is requested (DELETE) with the params: applicationId
@@ -21,7 +50,7 @@ def test_delete_one_message_with_applicationId():
     assert response.status_code == HTTPStatus.OK
 
 
-def test_delete_one_message_with_sessionId():
+def test_delete_one_message_with_session_id():
     """
         GIVEN a Flask application configured for testing
         WHEN the '/DeleteMessage' url is requested (DELETE) with the params: sessionId
@@ -33,7 +62,7 @@ def test_delete_one_message_with_sessionId():
     assert response.status_code == HTTPStatus.OK
 
 
-def test_delete_one_message_with_messageId():
+def test_delete_one_message_with_message_id():
     """
         GIVEN a Flask application configured for testing
         WHEN the '/DeleteMessage' url is requested (DELETE) with the params: messageId
@@ -49,7 +78,7 @@ def test_delete_one_message_with_messageId():
 # not found in data base:
 
 
-def test_delete_message_with_applicationId_not_in_db():
+def test_delete_message_with_application_id_not_in_db():
     """
         GIVEN a Flask application configured for testing
         WHEN the '/DeleteMessage' url is requested (DELETE) with the params: applicationId that are not in the db
@@ -62,7 +91,7 @@ def test_delete_message_with_applicationId_not_in_db():
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_delete_message_with_sessionId_not_in_db():
+def test_delete_message_with_session_id_not_in_db():
     """
         GIVEN a Flask application configured for testing
         WHEN the '/DeleteMessage' url is requested (DELETE) with the params: sessionId that are not in the db
@@ -75,7 +104,7 @@ def test_delete_message_with_sessionId_not_in_db():
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_delete_message_with_messageId_not_in_db():
+def test_delete_message_with_message_id_not_in_db():
     """
         GIVEN a Flask application configured for testing
         WHEN the '/DeleteMessage' url is requested (DELETE) with the params: messageId that are not in the db
@@ -92,7 +121,7 @@ def test_delete_message_with_messageId_not_in_db():
 # delete all instances
 
 
-def test_delete_all_messages_with_applicationId():
+def test_delete_all_messages_with_application_id():
     """
         GIVEN a Flask application configured for testing
         WHEN the '/DeleteMessage' url is requested (DELETE) with the params: applicationId
@@ -106,7 +135,7 @@ def test_delete_all_messages_with_applicationId():
     assert get_response.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_delete_all_messages_with_sessionId():
+def test_delete_all_messages_with_session_id():
     """
         GIVEN a Flask application configured for testing
         WHEN the '/DeleteMessage' url is requested (DELETE) with the params: sessionId
@@ -123,7 +152,7 @@ def test_delete_all_messages_with_sessionId():
 # **********************************************************************************************************************
 
 
-def test_delete_only_messages_with_applicationId():
+def test_delete_only_messages_with_application_id():
     """
         GIVEN a Flask application configured for testing
         WHEN the '/DeleteMessage' url is requested (DELETE) with the params: applicationId
@@ -140,7 +169,7 @@ def test_delete_only_messages_with_applicationId():
     assert get_response.json()[0] == data
 
 
-def test_delete_only_messages_with_sessionId():
+def test_delete_only_messages_with_session_id():
     """
         GIVEN a Flask application configured for testing
         WHEN the '/DeleteMessage' url is requested (DELETE) with the params: sessionId
@@ -157,7 +186,7 @@ def test_delete_only_messages_with_sessionId():
     assert get_response.json()[0] == data
 
 
-def test_delete_only_messages_with_messageId():
+def test_delete_only_messages_with_message_id():
     """
         GIVEN a Flask application configured for testing
         WHEN the '/DeleteMessage' url is requested (DELETE) with the params: messageId
@@ -183,10 +212,11 @@ def test_delete_with_two_params():
         WHEN the '/DeleteMessage' url is requested (DELETE) with the params: sessionId and applicationID
         THEN delete the message with the same sessionId and applicationID and leave the one with different messageId
     """
-    data_equal_seesion_and_app = test_utils.create_message_object(1, 'bbbb', 'a', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
-    data_equal_seesion_and_app2 = test_utils.create_message_object(1, 'bbbb', 'b', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
-    data_equal_seesion = test_utils.create_message_object(2, 'bbbb', 'c', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
-    data_equal_app = test_utils.create_message_object(1, 'aaaa', 'd', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
+    content = 'Hi, how are you today?'
+    data_equal_seesion_and_app = test_utils.create_message_object(1, 'bbbb', 'a', ['avi aviv', 'moshe cohen'], content)
+    data_equal_seesion_and_app2 = test_utils.create_message_object(1, 'bbbb', 'b', ['avi aviv', 'moshe cohen'], content)
+    data_equal_seesion = test_utils.create_message_object(2, 'bbbb', 'c', ['avi aviv', 'moshe cohen'], content)
+    data_equal_app = test_utils.create_message_object(1, 'aaaa', 'd', ['avi aviv', 'moshe cohen'], content)
     data =[data_equal_seesion_and_app,data_equal_seesion_and_app2,data_equal_app,data_equal_seesion]
     for d in data:
         test_utils.post_message(d)

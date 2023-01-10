@@ -1,17 +1,15 @@
 import json
-
-import pytest
-
-import src.response_texts
-import src.config
-from flask import Flask, request
 from http import HTTPStatus
+
+from flask import Flask, request
+
+import src.config
+import src.response_texts
 from db.db import create_messages_table, insert_message, get_all_messages_from_db, get_messages_from_db, \
     db_search_parameters, delete_messages_from_db
 from src.message_validations import message_is_valid
 
 app = Flask('Messages Manager App')
-
 create_messages_table()
 
 

@@ -23,7 +23,7 @@ def test_add_messages_with_currect_data():
     WHEN the '/AddMessage' url is requested (POST) with the body containing a message with all the right parameters
     THEN add the message to the DB
     """
-    data = test_utils.enter_data_to_db('application_id',10)
+    data = test_utils.enter_data_to_db('',10)
     for d in data:
         response = test_utils.get_message({'messageId' :d['message_id']})
         assert response.status_code == 200

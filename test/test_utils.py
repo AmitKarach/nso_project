@@ -8,6 +8,7 @@ URL_SERVICE_TEST = 'http://{}:{}'.format(HOST, PORT)
 def delete_message(params):
     return requests.delete(URL_SERVICE_TEST + '/DeleteMessage', params=params)
 
+
 def get_message(params):
     return requests.get(URL_SERVICE_TEST + '/GetMessage', params=params)
 
@@ -16,7 +17,7 @@ def post_message(data):
     return requests.post(URL_SERVICE_TEST + '/AddMessage', json=data)
 
 
-def create_message_object(application_id= None, session_id= None, message_id= None, participants= None, content= None):
+def create_message_object(application_id=None, session_id=None, message_id=None, participants=None, content=None):
     return {
         'application_id': application_id,
         'session_id': session_id,
@@ -24,6 +25,7 @@ def create_message_object(application_id= None, session_id= None, message_id= No
         'participants': participants,
         'content': content
     }
+
 
 def enter_data_to_db(key, how_many):
     """enters a large number of data (the size of how_many) where all the params are different except for key
