@@ -153,8 +153,8 @@ def test_get_all_messages_with_session_id():
 def test_get_with_two_params():
     """
         GIVEN a Flask application configured for testing
-        WHEN the '/DeleteMessage' url is requested (DELETE) with the params: sessionId and applicationID
-        THEN delete the message with the same sessionId and applicationID and leave the one with different messageId
+        WHEN the '/GetMessage' url is requested (GET) with the params: sessionId and applicationID
+        THEN get only the message with the same sessionId and applicationID
     """
     data_equal_seesion_and_app = test_utils.create_message_object(1, 'bbbb', 'a', ['avi aviv', 'moshe cohen'],
                                                                   'Hi, how are you today?')
@@ -169,9 +169,6 @@ def test_get_with_two_params():
         test_utils.post_message(d)
     params = {'applicationId': 1, 'sessionId': 'bbbb'}
     response = test_utils.get_message(params)
-    get_all_response = requests.get(test_utils.URL_SERVICE_TEST)
-    test_utils.delete_message({'messageId': 'c'})
-    test_utils.delete_message({'messageId': 'd'})
     assert response.status_code == HTTPStatus.OK
     assert data_equal_seesion_and_app in response.json() and data_equal_seesion_and_app2 in response.json()
-    assert data_equal_app in get_all_response.json() and data_equal_seesion in get_all_response.json()
+    assert data_equal_app not in response.json() and data_equal_seesion not in response.json()

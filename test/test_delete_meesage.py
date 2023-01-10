@@ -46,8 +46,11 @@ def test_delete_one_message_with_application_id():
     """
     data = test_utils.create_message_object(1, 'aaaa', 'bbbb', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
     test_utils.post_message(data)
-    response = test_utils.delete_message({'applicationId': 1})
+    params={'applicationId': 1}
+    response = test_utils.delete_message(params)
+    get_response = test_utils.get_message(params)
     assert response.status_code == HTTPStatus.OK
+    assert get_response.status_code == HTTPStatus.NOT_FOUND
 
 
 def test_delete_one_message_with_session_id():
@@ -58,8 +61,12 @@ def test_delete_one_message_with_session_id():
     """
     data = test_utils.create_message_object(1, 'aaaa', 'bbbb', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
     test_utils.post_message(data)
-    response = test_utils.delete_message({'sessionId': 'aaaa'})
+    params= {'sessionId': 'aaaa'}
+    response = test_utils.delete_message(params)
+    get_response = test_utils.get_message(params)
     assert response.status_code == HTTPStatus.OK
+    assert get_response.status_code == HTTPStatus.NOT_FOUND
+
 
 
 def test_delete_one_message_with_message_id():
@@ -70,8 +77,11 @@ def test_delete_one_message_with_message_id():
     """
     data = test_utils.create_message_object(1, 'aaaa', 'bbbb', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
     test_utils.post_message(data)
-    response = test_utils.delete_message({'messageId': 'bbbb'})
+    params ={'messageId': 'bbbb'}
+    response = test_utils.delete_message(params)
+    get_response = test_utils.get_message(params)
     assert response.status_code == HTTPStatus.OK
+    assert get_response.status_code == HTTPStatus.NOT_FOUND
 
 
 # **********************************************************************************************************************
@@ -87,7 +97,6 @@ def test_delete_message_with_application_id_not_in_db():
     data = test_utils.create_message_object(1, 'aaaa', 'bbbb', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
     test_utils.post_message(data)
     response = test_utils.delete_message({'applicationId': 2})
-    test_utils.delete_message({'applicationId': 1})
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
@@ -100,7 +109,6 @@ def test_delete_message_with_session_id_not_in_db():
     data = test_utils.create_message_object(1, 'aaaa', 'bbbb', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
     test_utils.post_message(data)
     response = test_utils.delete_message({'sessionId': 'bbbb'})
-    test_utils.delete_message({'sessionId': 'aaaa'})
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
@@ -113,7 +121,6 @@ def test_delete_message_with_message_id_not_in_db():
     data = test_utils.create_message_object(1, 'aaaa', 'bbbb', ['avi aviv', 'moshe cohen'], 'Hi, how are you today?')
     test_utils.post_message(data)
     response = test_utils.delete_message({'messageId': 'aaaa'})
-    test_utils.delete_message({'messageId': 'bbbb'})
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
@@ -223,7 +230,6 @@ def test_delete_with_two_params():
     params = {'applicationId': 1, 'sessionId': 'bbbb'}
     response = test_utils.delete_message(params)
     get_response = requests.get(test_utils.URL_SERVICE_TEST)
-    test_utils.delete_message({'messageId': 'c'})
-    test_utils.delete_message({'messageId': 'd'})
     assert response.status_code == HTTPStatus.OK
+    assert data_equal_seesion_and_app not in get_response.json() and data_equal_seesion_and_app2 not in get_response.json()
     assert data_equal_app in get_response.json() and data_equal_seesion in get_response.json()
